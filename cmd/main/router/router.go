@@ -1,6 +1,7 @@
 package router
 
 import (
+	"context"
 	"gosearch/search"
 	"net/http"
 
@@ -13,14 +14,16 @@ var (
 	query = "query"
 )
 
-func searchQuery(ginContext *gin.Context) {
-	queryString := ginContext.Query(query)
-	results := search.Search(queryString)
-	ginContext.JSON(http.StatusOK, results)
+func searchQuery(searcher search.Searcher, ctx context.Context) gin.HandlerFunc {
+	return func(ginContext *gin.Context) {
+		queryString := ginContext.Query(query)
+		results := searcher.Search(queryString, ctx)
+		ginContext.JSON(http.StatusOK, results)
+	}
 }
 
-func Run() {
+func Run(searcher search.Searcher, ctx context.Context) {
 	router := gin.Default()
-	router.GET(searchString, searchQuery)
+	router.GET(searchString, searchQuery(searcher, ctx))
 	router.Run(portString)
 }

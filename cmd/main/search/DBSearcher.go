@@ -3,46 +3,31 @@ package search
 import (
 	"context"
 	"gosearch/logger"
-	"os"
 	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+type DBSearcher struct {
+	Connection *pgxpool.Pool
+}
 
 type Result struct {
 	URL   string
 	Score float64
 }
 
-var (
-	ctx = context.Background()
-	defaultDatabaseUrl = "postgres://user:pass@host.docker.internal:5433/goprocess"
-)
-
-func getDBUrl() string {
-	databaseUrl := os.Getenv("DATABASE_URL")
-	if databaseUrl == "" {
-		databaseUrl = defaultDatabaseUrl
+func (dbSearcher DBSearcher) Search(query string, ctx context.Context) []Result {
+	if dbSearcher.Connection == nil {
+		panic("Null connection specified")
 	}
-
-	return databaseUrl
-}
-
-func Search(query string) []Result {
-	dbUrl := getDBUrl()
-	connection, err := pgxpool.New(ctx, dbUrl)
-	if err != nil {
-		logger.Log.Error("Unable to get connection pool", "error", err)
-		return nil
-	}
-	defer connection.Close()
 
 	terms := strings.Fields(strings.ToLower(query))
 	if len(terms) == 0 {
 		return nil
 	}
 
-	rows, err := connection.Query(ctx, `
+	rows, err := dbSearcher.Connection.Query(ctx, `
 		WITH matched AS (
 			SELECT url, term, termcount
 			FROM t_url_term_count
