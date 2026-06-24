@@ -12,7 +12,7 @@ var (
 )
 
 func getSearcher() search.Searcher {
-	return search.DBSearcher {
+	return search.DBSearcher{
 		Connection: db.GetDB(ctx),
 	}
 }

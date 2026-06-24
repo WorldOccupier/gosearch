@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	portString = ":8080"
+	portString   = ":8080"
 	searchString = "search"
-	query = "query"
+	query        = "query"
 )
 
 func searchQuery(searcher search.Searcher, ctx context.Context) gin.HandlerFunc {
