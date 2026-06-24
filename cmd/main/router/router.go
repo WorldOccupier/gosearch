@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"gosearch/logger"
 	"gosearch/search"
 	"net/http"
 
@@ -25,5 +26,7 @@ func searchQuery(searcher search.Searcher, ctx context.Context) gin.HandlerFunc 
 func Run(searcher search.Searcher, ctx context.Context) {
 	router := gin.Default()
 	router.GET(searchString, searchQuery(searcher, ctx))
-	router.Run(portString)
+	if err := router.Run(portString); err != nil {
+		logger.Log.Error("Server failed to start", "error", err)
+	}
 }

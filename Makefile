@@ -1,4 +1,4 @@
-.PHONY: up down rebuild logs clean localbuild
+.PHONY: up down rebuild logs clean localbuild lint
 
 up:
 	docker compose up -d
@@ -14,6 +14,9 @@ logs:
 
 clean:
 	docker compose down -v
+
+lint:
+	cd cmd/main && golangci-lint run ./...
 
 localbuild:
 	go build -C cmd/main -o ../../gosearch .
